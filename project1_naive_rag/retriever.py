@@ -60,7 +60,7 @@ class Retriever:
         Same as retrieve(), but prints what was found.
         Useful during development and for understanding system behaviour.
         """
-        print(f"\n  🔍 Retrieving for: '{question}'")
+        print(f"\n   Retrieving for: '{question}'")
 
         results = self.retrieve(question)
 
