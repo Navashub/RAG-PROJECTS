@@ -1,2 +1,54 @@
 .venv 
 venv
+# ─────────────────────────────────────────────────────────
+# Python
+# ─────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# ─────────────────────────────────────────────────────────
+# Environment & secrets
+# ─────────────────────────────────────────────────────────
+.env
+*.env.local
+
+# ─────────────────────────────────────────────────────────
+# Editor / IDE
+# ─────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+
+# ─────────────────────────────────────────────────────────
+# OS-specific
+# ─────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ─────────────────────────────────────────────────────────
+# Package manager lock/cache (uv, since you're using uv.lock)
+# ─────────────────────────────────────────────────────────
+# NOTE: uv.lock is usually fine to COMMIT (it pins reproducible
+# dependency versions, like package-lock.json). Listed here only
+# as a comment so you know it's a deliberate choice, not an oversight.
+# uv.lock
+
+# ─────────────────────────────────────────────────────────
+# Project-specific: don't commit large/sensitive personal data
+# ─────────────────────────────────────────────────────────
+# Uncomment if your data/ folder ever contains real company
+# documents you don't want public on GitHub:
+# data/
