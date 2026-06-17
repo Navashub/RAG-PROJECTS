@@ -1,0 +1,10 @@
+Engineering Standards and Practices - TechCorp
+
+All code must pass automated tests before being merged into the main branch.
+Pull requests require at least 2 approvals from senior engineers.
+Every service must have a runbook documenting how to debug and recover from incidents.
+Deployments to production happen every Tuesday and Thursday unless it is an emergency patch.
+All APIs must follow the company REST guidelines and include OpenAPI documentation.
+Database migrations must be backward-compatible and reversible.
+Secrets must never be committed to source control — use the company secrets manager.
+Performance budgets: API endpoints must respond within 200ms at the 95th percentile.

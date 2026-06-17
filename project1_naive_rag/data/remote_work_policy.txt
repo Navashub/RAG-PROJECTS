@@ -1,0 +1,10 @@
+Remote Work Policy - TechCorp Inc.
+
+Effective January 2024, TechCorp allows all employees to work remotely up to 3 days per week.
+Employees must be available between 10am and 3pm in their local timezone — these are core hours.
+A stable internet connection of at least 50 Mbps is required for remote work.
+Employees working remotely must attend all scheduled team meetings via video call.
+Remote work is not permitted during the first 90 days of employment.
+Requests for fully remote work must be approved by both the direct manager and HR.
+Equipment such as laptops and monitors may be requested through the IT portal.
+Any data security incidents must be reported to the security team within 1 hour.
