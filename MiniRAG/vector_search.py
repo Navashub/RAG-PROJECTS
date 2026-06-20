@@ -1,75 +1,55 @@
 """
 
- LESSON 3 - VECTOR SEARCH                                
- Goal: Given a question, find the most relevant chunks   
+  LESSON 3  VECTOR SEARCH  (multi-environment version)   
+  Local  → Ollama  (nomic-embed-text)                     
+  Render → sentence-transformers (nomic-embed-text-v1.5)  
 
 
 WHAT IS VECTOR SEARCH?
-  We have a list of embedded chunks (from Lesson 2).
-  We embed the user's question using the same model.
+  We embed every chunk and store it.
+  When a question comes in, we embed it with the SAME model.
   We compare the question vector to every chunk vector.
   The chunks with the highest similarity score are returned.
 
 THIS IS YOUR MINI VECTOR DATABASE.
-  Real tools like ChromaDB or FAISS do the same thing —
-  just faster and at larger scale. Understanding this file
-  means you understand what those tools do under the hood.
+  Real tools like ChromaDB or FAISS do exactly this —
+  just faster and at larger scale.
 
-WHAT YOU WILL SEE WHEN YOU RUN THIS FILE:
-  - All chunks embedded and stored
-  - A question embedded and compared to each chunk
-  - Ranked results showing which chunks matched best
-
-Requirements:
-  pip install anthropic numpy
-  export ANTHROPIC_API_KEY="sk-ant-..."
+NOTE ON EMBEDDING:
+  This file imports embed_text from 2_embedding.py.
+  That means it automatically uses:
+    - Ollama (nomic-embed-text) when MINIRAG_ENV=local
+    - sentence-transformers   when MINIRAG_ENV=production
+  No changes needed here when switching environments.
 """
 
 import numpy as np
-import anthropic
+from config import CONFIG, show_config
 
-# Re-use the chunking function from Lesson 1
-def chunk_text(text: str, chunk_size: int = 300, overlap: int = 50) -> list[str]:
-    chunks = []
-    start = 0
-    while start < len(text):
-        end = start + chunk_size
-        if end >= len(text):
-            chunks.append(text[start:].strip())
-            break
-        boundary = text.rfind(". ", start, end)
-        if boundary != -1:
-            end = boundary + 1
-        chunk = text[start:end].strip()
-        if chunk:
-            chunks.append(chunk)
-        start = end - overlap
-    return chunks
+# ── Import chunking from Lesson 1 ─────────────────────────────────────────────
+from importlib import import_module
+_chunking = import_module("1_chunking")
+chunk_text = _chunking.chunk_text
 
-client = anthropic.Anthropic()
-
-def embed_text(text: str) -> np.ndarray:
-    response = client.embeddings.create(model="voyage-3", input=text)
-    return np.array(response.embeddings[0].embedding, dtype=np.float32)
-
-def cosine_similarity(a: np.ndarray, b: np.ndarray) -> float:
-    return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)))
+# ── Import embedding from Lesson 2 (environment-aware) ───────────────────────
+_embedding = import_module("2_embedding")
+embed_text         = _embedding.embed_text
+cosine_similarity  = _embedding.cosine_similarity
 
 
-# ─ The core of this lesson 
+# ── Core functions ────────────────────────────────────────────────────────────
 
 def build_vector_store(chunks: list[str]) -> list[dict]:
     """
     Embed every chunk and store it with its text.
     This is your in-memory vector database.
 
-    Returns a list of dicts, each with:
-        { "text": str, "vector": np.ndarray }
+    Returns a list of dicts: [{ "text": str, "vector": np.ndarray }, ...]
     """
     print(f"  Building vector store from {len(chunks)} chunks...")
     store = []
     for i, chunk in enumerate(chunks):
-        vector = embed_text(chunk)
+        vector = embed_text(chunk)           # ← uses Ollama or sentence-transformers
         store.append({"text": chunk, "vector": vector})
         print(f"    [{i+1}/{len(chunks)}] embedded ✓")
     return store
@@ -85,43 +65,42 @@ def search(query: str, store: list[dict], top_k: int = 3) -> list[dict]:
         top_k:  How many top results to return.
 
     Returns:
-        A list of dicts: [{ "score": float, "text": str }, ...]
+        A sorted list of dicts: [{ "score": float, "text": str }, ...]
     """
-    # Embed the question using the SAME model as the documents
+    # Embed the question with the SAME model used for the chunks
     query_vector = embed_text(query)
 
-    # Score every chunk
+    # Score every chunk against the query
     results = []
     for item in store:
         score = cosine_similarity(query_vector, item["vector"])
         results.append({"score": score, "text": item["text"]})
 
-    # Sort by score, highest first
+    # Best match first
     results.sort(key=lambda x: x["score"], reverse=True)
-
     return results[:top_k]
 
 
+# ── DEMO ──────────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
 
     print("=" * 60)
     print("  LESSON 3: VECTOR SEARCH")
     print("=" * 60)
+    show_config()
 
-    # Load and chunk the document
     with open("document.txt", "r") as f:
         document = f.read()
 
-    print("\n[1] Chunking the document...")
+    print("[1] Chunking the document...")
     chunks = chunk_text(document)
     print(f"    → {len(chunks)} chunks\n")
 
-    print("[2] Embedding all chunks (building the vector store)...")
+    print("[2] Building the vector store...")
     store = build_vector_store(chunks)
-    print(f"    → Vector store ready with {len(store)} entries\n")
+    print(f"    → {len(store)} vectors stored\n")
 
-    # Now test several questions
     questions = [
         "What are the two phases of RAG?",
         "How does cosine similarity work?",
@@ -141,11 +120,11 @@ if __name__ == "__main__":
 
         print()
 
-    print("""
-   1. We embed the QUERY the same way as the documents.
-   2. We score every chunk — the closer the score to 1.0, the better the match.
-   3. top_k controls how many chunks we send to the LLM.
-      More chunks = more context, but also a longer (more expensive) prompt.
-   4. Real vector databases (ChromaDB, FAISS, Pinecone) do exactly this —
-      they just do it much faster using clever indexing algorithms.
+    print(f"""
+   1. embed_text() here uses: {'Ollama' if CONFIG['env'] == 'local' else 'sentence-transformers'}
+      — same function, different backend depending on environment
+   2. We score every chunk against the query vector
+   3. top_k controls how many chunks go into the final prompt
+   4. Real vector DBs (ChromaDB, FAISS, Pinecone) do this same
+      math — just much faster with indexing tricks
 """)
