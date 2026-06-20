@@ -28,11 +28,11 @@ from config import CONFIG, show_config
 
 # ── Import chunking from Lesson 1 ─────────────────────────────────────────────
 from importlib import import_module
-_chunking = import_module("1_chunking")
+_chunking = import_module("chunking")
 chunk_text = _chunking.chunk_text
 
 # ── Import embedding from Lesson 2 (environment-aware) ───────────────────────
-_embedding = import_module("2_embedding")
+_embedding = import_module("embedding")
 embed_text         = _embedding.embed_text
 cosine_similarity  = _embedding.cosine_similarity
 

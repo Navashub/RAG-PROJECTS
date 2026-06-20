@@ -55,7 +55,15 @@ def chunk_text(text: str, chunk_size: int = 300, overlap: int = 50) -> list[str]
             chunks.append(chunk)
 
         
-        start = end - overlap
+        next_start = end - overlap
+        if next_start <= start:
+            next_start = start + 1
+ 
+        start = next_start
+ 
+        # Stop if we have reached the end
+        if end >= len(text):
+            break
 
     return chunks
 

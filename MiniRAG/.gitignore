@@ -1,0 +1,10 @@
+.venv
+.python-version
+uv.lock 
+.cache/
+models/
+
+__pycache__/
+*.pyc
+*.pyo
+.env
