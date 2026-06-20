@@ -1,3 +1,4 @@
+![MiniRAG](assets/minirag_devto_poster.png)
 # MiniRAG
 
 A minimal, fully explained Retrieval-Augmented Generation (RAG) system built for learning and teaching.
