@@ -136,7 +136,7 @@ if __name__ == "__main__":
         "What are the two main phases of RAG?",
         "What does cosine similarity measure?",
         "Why do organisations prefer RAG over retraining their models?",
-        # This is NOT in the document — watch the model say "I don't know"
+        # This is NOT in the document - watch the model say "I don't know"
         "Who invented RAG and in which year?",
     ]
 

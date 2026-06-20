@@ -1,29 +1,19 @@
-Retrieval-Augmented Generation (RAG) is a technique that improves the accuracy
-of large language models by giving them access to external knowledge at query time.
-Instead of relying solely on what the model learned during training, RAG retrieves
-relevant documents from a knowledge base and uses them as context when generating
-an answer.
+Retrieval-Augmented Generation (RAG) is a technique that improves the accuracy of large language models by giving them access to external knowledge at query time. Instead of relying solely on what the model learned during training, RAG retrieves relevant documents from a knowledge base and uses them as context when generating an answer. This approach combines the strengths of retrieval systems and generative models to produce more accurate, grounded, and up-to-date responses.
 
-The RAG pipeline has two main phases. The first is indexing: documents are split
-into smaller chunks, each chunk is converted into a numerical vector (an embedding)
-using an embedding model, and these vectors are stored in a vector database.
+The RAG pipeline has two main phases. The first phase is indexing. During indexing, documents are collected and split into smaller chunks. Each chunk is then converted into a numerical vector called an embedding using an embedding model. These vectors are stored in a vector database, which is optimized for fast similarity search. The indexing phase is done once and the results are saved so that the system does not have to re-process the documents every time a question is asked.
 
-The second phase is retrieval and generation: when a user asks a question, the
-question is also converted into an embedding. The system then searches the vector
-database for chunks whose embeddings are most similar to the question embedding.
-The top matching chunks are retrieved and added to the prompt sent to the LLM.
+The second phase is retrieval and generation. This phase happens every time a user asks a question. First, the question itself is converted into an embedding using the same embedding model that was used during indexing. The system then searches the vector database to find the chunks whose embeddings are most similar to the question embedding. The top matching chunks are retrieved and combined with the original question to form a prompt. This prompt is then sent to a large language model, which generates a final answer based only on the provided context.
 
-Vector similarity is usually measured using cosine similarity, which calculates
-the angle between two vectors. A score of 1.0 means the vectors are identical
-in direction (very similar meaning), while a score near 0 means the texts are
-unrelated.
+Embeddings are numerical representations of text. They are produced by a neural network that has been trained to capture the meaning of text in a compact form. Similar pieces of text will have embeddings that are close together in vector space, while unrelated pieces of text will have embeddings that are far apart. This property is what makes it possible to search for relevant chunks by comparing their embeddings to the query embedding.
 
-RAG is widely used in enterprise applications, customer support bots, and
-document Q&A systems because it allows organisations to keep their LLMs updated
-with new information without expensive retraining. The knowledge base can be
-updated simply by adding new documents and re-embedding them.
+Vector similarity is measured using cosine similarity. Cosine similarity calculates the angle between two vectors. A score of 1.0 means the two vectors point in exactly the same direction, which indicates very similar meaning. A score of 0.0 means the vectors are perpendicular, indicating no relationship. A score close to negative 1.0 means the vectors point in opposite directions, indicating opposite meanings. In practice, most text comparisons produce scores between 0.0 and 1.0.
 
-A common challenge in RAG is chunk size selection. Chunks that are too small
-may lose context, while chunks that are too large may include irrelevant information
-and dilute the answer. Overlapping chunks (where each chunk shares some text with
-the next) help ensure that sentences at boundaries are captured fully.
+Chunk size is one of the most important parameters in a RAG system. If chunks are too small, they may not contain enough context to answer a question fully. If chunks are too large, they may contain too much irrelevant information, which can confuse the language model. A good starting point is chunks of around 100 to 200 words with an overlap of 20 words between consecutive chunks. The overlap ensures that sentences at the boundary between two chunks are not lost.
+
+RAG is widely used in enterprise applications, customer support bots, and document question-answering systems. One of its main advantages is that it allows organisations to keep their AI systems up to date without expensive retraining. When new information becomes available, it can simply be added to the knowledge base and re-embedded. The language model itself does not need to be changed. This makes RAG a practical and cost-effective solution for many real-world use cases.
+
+A common challenge in RAG systems is handling questions that cannot be answered from the available documents. A well-designed RAG system should recognise when the retrieved chunks do not contain enough information and respond with something like I do not have enough information to answer that question. This is preferable to the model guessing or generating a hallucinated answer based on its training data.
+
+Another challenge is the quality of retrieval. If the embedding model does not produce good representations of the text, the retrieved chunks may not be relevant to the question. This is why it is important to use a high-quality embedding model and to evaluate retrieval performance separately from generation performance. Tools such as RAGAS and TruLens can be used to measure how well a RAG system is retrieving and generating answers.
+
+Advanced RAG techniques go beyond simple retrieval. Re-ranking is a technique where a second model scores the retrieved chunks and reorders them before they are passed to the language model. Hypothetical Document Embedding, also known as HyDE, generates a hypothetical answer to the question and uses that as the query for retrieval instead of the original question. RAG Fusion runs multiple search queries in parallel and combines the results. These techniques can significantly improve the quality of answers in complex use cases.
