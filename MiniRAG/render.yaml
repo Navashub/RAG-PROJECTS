@@ -1,0 +1,31 @@
+# ─────────────────────────────────────────────────────────────
+#  render.yaml - MiniRAG deployment config
+#
+#  This file tells Render exactly how to build and run MiniRAG.
+#  Commit this file to GitHub and Render will use it automatically.
+#
+#  IMPORTANT: Set these environment variables on Render dashboard:
+#    MINIRAG_ENV  = production
+#    GROQ_API_KEY = your_groq_key_here
+# ─────────────────────────────────────────────────────────────
+
+services:
+  - type: web
+    name: minirag
+    runtime: python
+    rootDir: MiniRAG
+
+    # Install dependencies
+    buildCommand: pip install -r requirements.txt
+
+    # Start the web server
+    # Render sets $PORT automatically - we read it in app.py
+    startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT
+
+    # Environment variables
+    # Add GROQ_API_KEY manually on the Render dashboard (never commit it)
+    envVars:
+      - key: MINIRAG_ENV
+        value: production
+      - key: PYTHON_VERSION
+        value: "3.11"
