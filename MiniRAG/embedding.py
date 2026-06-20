@@ -66,8 +66,7 @@ def embed_with_sentence_transformers(text: str) -> np.ndarray:
     if not hasattr(embed_with_sentence_transformers, "_model"):
         print("  Loading embedding model (first time only)...")
         embed_with_sentence_transformers._model = SentenceTransformer(
-            "nomic-ai/nomic-embed-text-v1.5",
-            trust_remote_code=True,
+            "sentence-transformers/all-MiniLM-L6-v2"
         )
 
     model = embed_with_sentence_transformers._model
